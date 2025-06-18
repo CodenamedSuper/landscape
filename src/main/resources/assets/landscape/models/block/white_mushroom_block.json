@@ -4,7 +4,7 @@
 		"0": "landscape:block/white_mushroom_block",
 		"1": "landscape:block/white_mushroom_block_bottom",
 		"2": "landscape:block/white_mushroom_block_top",
-		"particle": "landscape:block/white_mushroom_block"
+		"particle": "landscape:block/white_mushroom_block_top"
 	},
 	"elements": [
 		{
