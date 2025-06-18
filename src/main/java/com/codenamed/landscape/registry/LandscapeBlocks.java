@@ -1,10 +1,14 @@
 package com.codenamed.landscape.registry;
 
 import com.codenamed.landscape.Landscape;
+import com.codenamed.landscape.block.WhiteMushroomBlock;
+import com.codenamed.landscape.block.WhiteMushroomBlockBlock;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -13,12 +17,21 @@ public class LandscapeBlocks {
     public static final DeferredRegister.Blocks BLOCKS =
             DeferredRegister.createBlocks(Landscape.MOD_ID);
 
-    //public static final DeferredBlock<Block> TEMPLATE = registerBlock("template",
-    //        () -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.DIRT)));
+    public static final DeferredBlock<Block> WHITE_MUSHROOM = registerBlock("white_mushroom",
+            () -> new WhiteMushroomBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.BROWN_MUSHROOM)));
 
+    public static final DeferredBlock<Block> POTTED_WHITE_MUSHROOM = registerBlock("white_potted_mushroom",
+            () -> flowerPot(WHITE_MUSHROOM.get()));
+
+    public static final DeferredBlock<Block> WHITE_MUSHROOM_BlOCK = registerBlock("white_mushroom_block",
+            () -> new WhiteMushroomBlockBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.BROWN_MUSHROOM_BLOCK)));
 
     private static Block stair(DeferredBlock<Block> baseBlock) {
         return new StairBlock(baseBlock.get().defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(baseBlock.get()));
+    }
+
+    private static Block flowerPot(Block potted) {
+        return new FlowerPotBlock(potted, BlockBehaviour.Properties.of().instabreak().noOcclusion().pushReaction(PushReaction.DESTROY));
     }
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {

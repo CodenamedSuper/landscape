@@ -1,10 +1,7 @@
 package com.codenamed.landscape;
 
 
-import com.codenamed.landscape.registry.LandscapeBlocks;
-import com.codenamed.landscape.registry.LandscapeCreativeTabs;
-import com.codenamed.landscape.registry.LandscapeFeature;
-import com.codenamed.landscape.registry.LandscapeItems;
+import com.codenamed.landscape.registry.*;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.biome.Biome;
@@ -49,6 +46,7 @@ public class Landscape
         LandscapeBlocks.init(modEventBus);
         LandscapeCreativeTabs.init(modEventBus);
         LandscapeFeature.init(modEventBus);
+        LandscapeTreeDecoratorType.init(modEventBus);
 
         modEventBus.addListener(this::addCreative);
 

@@ -19,6 +19,9 @@ public class LandscapeCreativeTabs {
                     .title(Component.translatable("creativetab.landscape.landscape"))
                     .displayItems((itemDisplayParameters, output) -> {
 
+                        output.accept(LandscapeBlocks.WHITE_MUSHROOM_BlOCK);
+                        output.accept(LandscapeBlocks.WHITE_MUSHROOM);
+
                     }).build());
 
     public static void init(IEventBus eventBus) {

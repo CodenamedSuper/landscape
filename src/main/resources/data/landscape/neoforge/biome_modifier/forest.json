@@ -3,7 +3,9 @@
 
   "biomes": "minecraft:forest",
 
-  "features": "landscape:disk_coarse_dirt",
+  "features": [
+    "landscape:disk_coarse_dirt"
+  ],
 
   "step": "vegetal_decoration"
 }

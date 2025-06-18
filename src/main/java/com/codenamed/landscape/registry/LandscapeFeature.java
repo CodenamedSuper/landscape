@@ -1,6 +1,8 @@
 package com.codenamed.landscape.registry;
 
 import com.codenamed.landscape.Landscape;
+import com.codenamed.landscape.worldgen.feature.FallenTreeFeature;
+import com.codenamed.landscape.worldgen.feature.config.FallenTreeConfiguration;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
@@ -13,7 +15,8 @@ public class LandscapeFeature<FC extends FeatureConfiguration> {
 
 
     public static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(Registries.FEATURE, Landscape.MOD_ID);
-
+    public static final DeferredHolder FALLEN_TREE = FEATURES.register("fallen_tree", () ->
+            new FallenTreeFeature(FallenTreeConfiguration.CODEC));
 
     public static void init(IEventBus eventBus) {
         FEATURES.register(eventBus);
