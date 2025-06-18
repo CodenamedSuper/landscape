@@ -76,7 +76,7 @@ public class WhiteMushroomBlock extends BushBlock {
     }
 
     protected boolean mayPlaceOn(BlockState state, BlockGetter level, BlockPos pos) {
-        return state.isSolidRender(level, pos);
+        return state.isSolidRender(level, pos) && !level.getBlockState(pos.below()).isAir();
     }
 
     protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
