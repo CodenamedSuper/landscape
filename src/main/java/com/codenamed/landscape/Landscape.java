@@ -1,6 +1,7 @@
 package com.codenamed.landscape;
 
 
+import com.codenamed.landscape.entity.client.renderer.SongbirdRenderer;
 import com.codenamed.landscape.registry.*;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.tags.BiomeTags;
@@ -44,6 +45,7 @@ public class Landscape
 
         LandscapeItems.init(modEventBus);
         LandscapeBlocks.init(modEventBus);
+        LandscapeEntities.init(modEventBus);
         LandscapeCreativeTabs.init(modEventBus);
         LandscapeFeature.init(modEventBus);
         LandscapeTreeDecoratorType.init(modEventBus);
@@ -79,6 +81,8 @@ public class Landscape
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
         {
+
+            EntityRenderers.register(LandscapeEntities.SONGBIRD.get(), SongbirdRenderer::new);
         }
     }
 

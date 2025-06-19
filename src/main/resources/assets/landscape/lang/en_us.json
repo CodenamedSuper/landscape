@@ -2,6 +2,8 @@
   "creativetab.landscape.landscape": "Landscape",
   "block.landscape.white_mushroom": "White Mushroom",
   "block.landscape.white_mushroom_block": "White Mushroom Block",
-  "block.landscape.trillium": "Trillium"
+  "block.landscape.trillium": "Trillium",
 
+  "item.landscape.songbird_spawn_egg": "Songbird Spawn Egg",
+  "entity.landscape.songbird": "Songbird"
 }
