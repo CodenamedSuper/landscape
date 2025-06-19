@@ -26,11 +26,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "landscape:white_mushroom"
+          "name": "landscape:trillium"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "landscape:blocks/potted_white_mushroom"
+  "random_sequence": "landscape:blocks/potted_trillium"
 }

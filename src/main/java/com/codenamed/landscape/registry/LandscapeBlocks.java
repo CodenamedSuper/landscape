@@ -4,8 +4,10 @@ import com.codenamed.landscape.Landscape;
 import com.codenamed.landscape.block.WhiteMushroomBlock;
 import com.codenamed.landscape.block.WhiteMushroomBlockBlock;
 import com.mojang.serialization.MapCodec;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.component.SuspiciousStewEffects;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.PushReaction;
@@ -25,6 +27,12 @@ public class LandscapeBlocks {
 
     public static final DeferredBlock<Block> WHITE_MUSHROOM_BlOCK = registerBlock("white_mushroom_block",
             () -> new WhiteMushroomBlockBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.BROWN_MUSHROOM_BLOCK)));
+
+    public static final DeferredBlock<Block> TRILLIUM = registerBlock("trillium",
+            () -> new FlowerBlock(SuspiciousStewEffects.EMPTY,BlockBehaviour.Properties.ofFullCopy(Blocks.LILY_OF_THE_VALLEY)));
+
+    public static final DeferredBlock<Block> POTTED_TRILLIUM = registerBlock("potted_trillium",
+            () -> flowerPot(TRILLIUM.get()));
 
     private static Block stair(DeferredBlock<Block> baseBlock) {
         return new StairBlock(baseBlock.get().defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(baseBlock.get()));
