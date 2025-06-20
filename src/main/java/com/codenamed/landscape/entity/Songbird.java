@@ -54,6 +54,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.registries.datamaps.builtin.NeoForgeDataMaps;
 import net.neoforged.neoforge.registries.datamaps.builtin.ParrotImitation;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
@@ -87,10 +88,6 @@ public class Songbird extends Animal implements FlyingAnimal {
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
     }
 
-    public boolean isBaby() {
-        return false;
-    }
-
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new LookAtPlayerGoal(this, Player.class, 8.0F));
@@ -113,10 +110,6 @@ public class Songbird extends Animal implements FlyingAnimal {
 
         super.aiStep();
         this.calculateFlapping();
-    }
-
-    public void setRecordPlayingNearby(BlockPos pos, boolean isPartying) {
-        this.jukebox = pos;
     }
 
     private void calculateFlapping() {
@@ -142,10 +135,6 @@ public class Songbird extends Animal implements FlyingAnimal {
         return false;
     }
 
-    public static boolean checkParrotSpawnRules(EntityType<Parrot> parrot, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
-        return level.getBlockState(pos.below()).is(BlockTags.PARROTS_SPAWNABLE_ON) && isBrightEnoughToSpawn(level, pos);
-    }
-
     protected void checkFallDamage(double y, boolean onGround, BlockState state, BlockPos pos) {
     }
 
@@ -169,7 +158,12 @@ public class Songbird extends Animal implements FlyingAnimal {
 
     @Override
     protected SoundEvent getAmbientSound() {
-        return LandscapeSoundEvents.SONGBIRD_AMBIENT.get();
+        return this.isAlive() ? LandscapeSoundEvents.SONGBIRD_AMBIENT.get() : null;
+    }
+
+    @Override
+    protected float getSoundVolume() {
+        return 1f;
     }
 
     protected void playStepSound(BlockPos pos, BlockState block) {
@@ -193,10 +187,10 @@ public class Songbird extends Animal implements FlyingAnimal {
         return (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F;
     }
 
-    public SoundSource getSoundSource() {
+    @Override
+    public @NotNull SoundSource getSoundSource() {
         return SoundSource.NEUTRAL;
     }
-
     public boolean isPushable() {
         return true;
     }
@@ -210,10 +204,6 @@ public class Songbird extends Animal implements FlyingAnimal {
 
     public boolean isFlying() {
         return !this.onGround();
-    }
-
-    protected boolean canFlyToOwner() {
-        return true;
     }
 
     public Vec3 getLeashOffset() {

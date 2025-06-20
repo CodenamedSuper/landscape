@@ -86,6 +86,7 @@ public class SongbirdModel<T extends Songbird> extends HierarchicalModel<T> {
 
         this.songbird.yRot = headYaw * ((float)Math.PI / 180f);
         this.songbird.xRot = headPitch *  ((float)Math.PI / 180f);
+
     }
 
     @Override
