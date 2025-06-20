@@ -8,12 +8,13 @@ import net.minecraft.client.animation.KeyframeAnimations;
 public class SongbirdAnimations {
 
 
+
     public static final AnimationDefinition IDLE = AnimationDefinition.Builder.withLength(2f).looping()
             .addAnimation("songbird",
                     new AnimationChannel(AnimationChannel.Targets.POSITION,
                             new Keyframe(0f, KeyframeAnimations.posVec(0f, 0f, 0f),
                                     AnimationChannel.Interpolations.LINEAR),
-                            new Keyframe(0.7083434f, KeyframeAnimations.posVec(0f, 0f, 0f),
+                            new Keyframe(0.70833f, KeyframeAnimations.posVec(0f, 0f, 0f),
                                     AnimationChannel.Interpolations.LINEAR)))
             .addAnimation("songbird",
                     new AnimationChannel(AnimationChannel.Targets.ROTATION,
@@ -48,7 +49,7 @@ public class SongbirdAnimations {
                     new AnimationChannel(AnimationChannel.Targets.POSITION,
                             new Keyframe(0f, KeyframeAnimations.posVec(0f, 0f, 0f),
                                     AnimationChannel.Interpolations.LINEAR),
-                            new Keyframe(0.7083434f, KeyframeAnimations.posVec(0f, 0f, 0f),
+                            new Keyframe(0.70833f, KeyframeAnimations.posVec(0f, 0f, 0f),
                                     AnimationChannel.Interpolations.LINEAR)))
             .addAnimation("songbird",
                     new AnimationChannel(AnimationChannel.Targets.ROTATION,
@@ -105,5 +106,4 @@ public class SongbirdAnimations {
                             new Keyframe(1.5f, KeyframeAnimations.degreeVec(-22.5f, 0f, 0f),
                                     AnimationChannel.Interpolations.LINEAR),
                             new Keyframe(2f, KeyframeAnimations.degreeVec(0f, 0f, 0f),
-                                    AnimationChannel.Interpolations.LINEAR))).build();
-}
+                                    AnimationChannel.Interpolations.LINEAR))).build();}
