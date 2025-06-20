@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "landscape:block/trillium"
+      "model": "landscape:block/potted_trillium"
     }
   }
 }

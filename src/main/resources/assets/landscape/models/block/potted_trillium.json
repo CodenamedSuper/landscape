@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/flower_pot_cross",
   "textures": {
-    "plant": "landscape:block/potted_trillium"
+    "plant": "landscape:block/trillium"
   }
 }
