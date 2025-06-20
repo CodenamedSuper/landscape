@@ -1,6 +1,7 @@
 package com.codenamed.landscape.registry;
 
 import com.codenamed.landscape.Landscape;
+import com.codenamed.landscape.block.SongbirdNestBlock;
 import com.codenamed.landscape.block.WhiteMushroomBlock;
 import com.codenamed.landscape.block.WhiteMushroomBlockBlock;
 import com.mojang.serialization.MapCodec;
@@ -33,6 +34,9 @@ public class LandscapeBlocks {
 
     public static final DeferredBlock<Block> POTTED_TRILLIUM = registerBlock("potted_trillium",
             () -> flowerPot(TRILLIUM.get()));
+
+    public static final DeferredBlock<Block> SONGBIRD_NEST = registerBlock("songbird_nest",
+            () -> new SongbirdNestBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.HAY_BLOCK).sound(SoundType.AZALEA)));
 
     private static Block stair(DeferredBlock<Block> baseBlock) {
         return new StairBlock(baseBlock.get().defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(baseBlock.get()));
