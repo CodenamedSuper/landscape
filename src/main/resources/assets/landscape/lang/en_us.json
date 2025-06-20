@@ -5,5 +5,8 @@
   "block.landscape.trillium": "Trillium",
 
   "item.landscape.songbird_spawn_egg": "Songbird Spawn Egg",
-  "entity.landscape.songbird": "Songbird"
+  "entity.landscape.songbird": "Songbird",
+
+  "subtitles.entity.songbird.ambient": "Songbird chirping"
+
 }

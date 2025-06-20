@@ -1,0 +1,13 @@
+{
+  "entity.songbird.ambient": {
+    "subtitle": "subtitles.entity.songbird.ambient",
+
+    "sounds": [
+      "landscape:songbird/ambient0",
+      "landscape:songbird/ambient1",
+      "landscape:songbird/ambient2",
+      "landscape:songbird/ambient3",
+      "landscape:songbird/ambient4"
+    ]
+  }
+}

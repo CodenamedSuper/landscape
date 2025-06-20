@@ -46,6 +46,7 @@ public class Landscape
         LandscapeItems.init(modEventBus);
         LandscapeBlocks.init(modEventBus);
         LandscapeEntities.init(modEventBus);
+        LandscapeSoundEvents.init(modEventBus);
         LandscapeCreativeTabs.init(modEventBus);
         LandscapeFeature.init(modEventBus);
         LandscapeTreeDecoratorType.init(modEventBus);

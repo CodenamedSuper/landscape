@@ -1,5 +1,6 @@
 package com.codenamed.landscape.entity;
 
+import com.codenamed.landscape.registry.LandscapeSoundEvents;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
@@ -94,7 +95,6 @@ public class Songbird extends Animal implements FlyingAnimal {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new LookAtPlayerGoal(this, Player.class, 8.0F));
         this.goalSelector.addGoal(2, new Songbird.SongbirdWanderGoal(this, (double)1.0F));
-        this.goalSelector.addGoal(3, new FollowMobGoal(this, (double)1.0F, 3.0F, 7.0F));
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -158,10 +158,6 @@ public class Songbird extends Animal implements FlyingAnimal {
         return null;
     }
 
-    private static SoundEvent getImitatedSound(EntityType<?> type) {
-        ParrotImitation imitation = (ParrotImitation)type.builtInRegistryHolder().getData(NeoForgeDataMaps.PARROT_IMITATIONS);
-        return imitation != null ? imitation.sound() : SoundEvents.PARROT_AMBIENT;
-    }
 
     protected SoundEvent getHurtSound(DamageSource damageSource) {
         return SoundEvents.PARROT_HURT;
@@ -169,6 +165,11 @@ public class Songbird extends Animal implements FlyingAnimal {
 
     protected SoundEvent getDeathSound() {
         return SoundEvents.PARROT_DEATH;
+    }
+
+    @Override
+    protected SoundEvent getAmbientSound() {
+        return LandscapeSoundEvents.SONGBIRD_AMBIENT.get();
     }
 
     protected void playStepSound(BlockPos pos, BlockState block) {

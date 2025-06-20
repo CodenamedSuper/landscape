@@ -43,7 +43,7 @@ public class SongbirdAnimations {
                     new AnimationChannel(AnimationChannel.Targets.ROTATION,
                             new Keyframe(0f, KeyframeAnimations.degreeVec(0f, 0f, 0f),
                                     AnimationChannel.Interpolations.LINEAR))).build();
-    public static final AnimationDefinition FLYING = AnimationDefinition.Builder.withLength(2f).looping()
+    public static final AnimationDefinition FLY = AnimationDefinition.Builder.withLength(2f).looping()
             .addAnimation("songbird",
                     new AnimationChannel(AnimationChannel.Targets.POSITION,
                             new Keyframe(0f, KeyframeAnimations.posVec(0f, 0f, 0f),

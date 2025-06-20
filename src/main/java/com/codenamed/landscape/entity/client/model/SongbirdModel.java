@@ -77,7 +77,7 @@ public class SongbirdModel<T extends Songbird> extends HierarchicalModel<T> {
         this.root().getAllParts().forEach(ModelPart::resetPose);
         this.applyHeadRotation(netHeadYaw, headPitch);
 
-        this.animateWalk(SongbirdAnimations.FLYING, limbSwing, limbSwingAmount, 3f, 2.5f);
+        this.animateWalk(SongbirdAnimations.FLY, limbSwing, limbSwingAmount, 3f, 2.5f);
     }
 
     private void applyHeadRotation(float headYaw, float headPitch) {
