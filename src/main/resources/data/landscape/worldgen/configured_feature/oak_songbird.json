@@ -4,7 +4,7 @@
     "decorators": [
       {
         "type": "landscape:songbird_nest",
-        "probability": 0.3
+        "probability": 0.4
       }
     ],
     "dirt_provider": {

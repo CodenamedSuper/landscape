@@ -1,5 +1,6 @@
 package com.codenamed.landscape.entity;
 
+import com.codenamed.landscape.block.entity.SongbirdNestBlockEntity;
 import com.codenamed.landscape.registry.LandscapeBlocks;
 import com.codenamed.landscape.registry.LandscapeEntities;
 import com.codenamed.landscape.registry.LandscapeItemTags;
@@ -51,6 +52,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
@@ -60,6 +62,7 @@ import net.neoforged.neoforge.registries.datamaps.builtin.ParrotImitation;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +77,11 @@ public class Songbird extends Animal implements FlyingAnimal {
     public float oFlap;
     private float flapping = 1.0F;
     private float nextFlap = 1.0F;
+
+    public  BlockPos nestPos;
+
+    private boolean sleeping = false;
+
     @javax.annotation.Nullable
     private BlockPos jukebox;
 
@@ -98,6 +106,8 @@ public class Songbird extends Animal implements FlyingAnimal {
         this.goalSelector.addGoal(4, new FollowParentGoal(this, 1.25));
         this.goalSelector.addGoal(5, new LookAtPlayerGoal(this, Player.class, 8.0F));
         this.goalSelector.addGoal(6, new Songbird.SongbirdWanderGoal(this, (double)1.0F));
+        this.goalSelector.addGoal(7, new SongbirdSleepAtNestGoal(this, 1.0D));
+
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -217,8 +227,81 @@ public class Songbird extends Animal implements FlyingAnimal {
         return new Vec3((double)0.0F, (double)(0.5F * this.getEyeHeight()), (double)(this.getBbWidth() * 0.4F));
     }
 
+    static class SongbirdSleepAtNestGoal extends Goal {
+        private final Songbird songbird;
+        private final double speed;
+        private BlockPos targetNest;
+
+        public SongbirdSleepAtNestGoal(Songbird bird, double speed) {
+            this.songbird = bird;
+            this.speed = speed;
+            this.setFlags(EnumSet.of(Flag.MOVE));
+        }
+
+        @Override
+        public boolean canUse() {
+            Level level = songbird.level();
+            if (!(level instanceof ServerLevel) || !level.dimension().equals(Level.OVERWORLD)) return false;
+            if (!level.isNight()) return false;
+
+            targetNest = findNearbyUnoccupiedNest();
+            return targetNest != null;
+        }
+
+        @Override
+        public void start() {
+            if (targetNest != null) {
+                songbird.getNavigation().moveTo(targetNest.getX() + 0.5, targetNest.getY() + 0.5, targetNest.getZ() + 0.5, speed);
+            }
+        }
+
+        @Override
+        public boolean canContinueToUse() {
+            return songbird.sleeping;
+        }
+
+        @Override
+        public void tick() {
+            if (songbird.sleeping) {
+                if (!songbird.level().isNight()) {
+                    songbird.sleeping = false;
+                    if (targetNest != null) {
+                        BlockEntity be = songbird.level().getBlockEntity(targetNest);
+                        if (be instanceof SongbirdNestBlockEntity nestBe) {
+                            nestBe.occupant.remove();
+                        }
+                    }
+                } else {
+
+                    songbird.setDeltaMovement(Vec3.ZERO);
+                    songbird.getNavigation().stop();
+                    songbird.setPos(targetNest.getX() + 0.5, targetNest.getY() + 0.5, targetNest.getZ() + 0.5);
+                }
+            }
+        }
+
+        @Override
+        public void stop() {
+
+        }
+
+        private BlockPos findNearbyUnoccupiedNest() {
+            BlockPos origin = songbird.blockPosition();
+            for (BlockPos pos : BlockPos.betweenClosed(origin.offset(-6, -3, -6), origin.offset(6, 3, 6))) {
+                if (songbird.level().getBlockState(pos).is(LandscapeBlocks.SONGBIRD_NEST)) {
+                    BlockEntity be = songbird.level().getBlockEntity(pos);
+                    if (be instanceof SongbirdNestBlockEntity nestBe && !nestBe.occupant.occupied()) {
+                        return pos.immutable();
+                    }
+                }
+            }
+            return null;
+        }
+    }
+
     static class SongbirdWanderGoal extends WaterAvoidingRandomFlyingGoal {
         public SongbirdWanderGoal(PathfinderMob pathfinderMob, double d) {
+
             super(pathfinderMob, d);
         }
 

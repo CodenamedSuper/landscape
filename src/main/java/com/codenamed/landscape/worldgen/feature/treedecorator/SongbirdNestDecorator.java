@@ -1,5 +1,6 @@
 package com.codenamed.landscape.worldgen.feature.treedecorator;
 
+import com.codenamed.landscape.block.SongbirdNestBlock;
 import com.codenamed.landscape.entity.Songbird;
 import com.codenamed.landscape.registry.LandscapeBlocks;
 import com.codenamed.landscape.registry.LandscapeEntities;
@@ -57,8 +58,7 @@ public class SongbirdNestDecorator extends TreeDecorator {
         if (context.isAir(nestPos)) {
 
             if (context.isAir(nestPos)) {
-                context.setBlock(nestPos, LandscapeBlocks.SONGBIRD_NEST.get().defaultBlockState());
-
+                context.setBlock(nestPos, LandscapeBlocks.SONGBIRD_NEST.get().defaultBlockState().setValue(SongbirdNestBlock.OCCUPIED, true));
             }
 
         }
