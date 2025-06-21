@@ -18,7 +18,9 @@ public class SongbirdRenderer extends MobRenderer<Songbird, SongbirdModel<Songbi
 
     @Override
     public ResourceLocation getTextureLocation(Songbird songbird) {
-        return ResourceLocation.fromNamespaceAndPath(Landscape.MOD_ID, "textures/entity/songbird.png");
+        return songbird.isSleeping()
+                ? ResourceLocation.fromNamespaceAndPath(Landscape.MOD_ID, "textures/entity/songbird_sleeping.png")
+                : ResourceLocation.fromNamespaceAndPath(Landscape.MOD_ID, "textures/entity/songbird.png");
     }
 
     @Override
