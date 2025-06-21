@@ -1,7 +1,11 @@
 package com.codenamed.landscape.worldgen.feature.treedecorator;
 
+import com.codenamed.landscape.entity.Songbird;
 import com.codenamed.landscape.registry.LandscapeBlocks;
+import com.codenamed.landscape.registry.LandscapeEntities;
 import com.codenamed.landscape.registry.LandscapeTreeDecoratorType;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator;
 
@@ -54,12 +58,12 @@ public class SongbirdNestDecorator extends TreeDecorator {
 
             if (context.isAir(nestPos)) {
                 context.setBlock(nestPos, LandscapeBlocks.SONGBIRD_NEST.get().defaultBlockState());
+
             }
 
         }
+
     }
-
-
 
 
     static {

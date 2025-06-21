@@ -1,5 +1,8 @@
 package com.codenamed.landscape.entity;
 
+import com.codenamed.landscape.registry.LandscapeBlocks;
+import com.codenamed.landscape.registry.LandscapeEntities;
+import com.codenamed.landscape.registry.LandscapeItemTags;
 import com.codenamed.landscape.registry.LandscapeSoundEvents;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -90,12 +93,20 @@ public class Songbird extends Animal implements FlyingAnimal {
 
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(1, new LookAtPlayerGoal(this, Player.class, 8.0F));
-        this.goalSelector.addGoal(2, new Songbird.SongbirdWanderGoal(this, (double)1.0F));
+        this.goalSelector.addGoal(2, new BreedGoal(this, 1.0));
+        this.goalSelector.addGoal(3, new TemptGoal(this, 1.25, stack -> stack.is(LandscapeItemTags.SONGBIRD_FOOD), false));
+        this.goalSelector.addGoal(4, new FollowParentGoal(this, 1.25));
+        this.goalSelector.addGoal(5, new LookAtPlayerGoal(this, Player.class, 8.0F));
+        this.goalSelector.addGoal(6, new Songbird.SongbirdWanderGoal(this, (double)1.0F));
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, (double)6.0F).add(Attributes.FLYING_SPEED, (double)0.4F).add(Attributes.MOVEMENT_SPEED, (double)0.2F).add(Attributes.ATTACK_DAMAGE, (double)3.0F);
+        return Mob.createMobAttributes()
+                .add(Attributes.MAX_HEALTH, (double)6.0F)
+                .add(Attributes.FLYING_SPEED, (double)0.4F)
+                .add(Attributes.MOVEMENT_SPEED, (double)0.2F)
+                .add(Attributes.ATTACK_DAMAGE, (double)3.0F)
+                .add(Attributes.FOLLOW_RANGE, 24D);
     }
 
     protected PathNavigation createNavigation(Level level) {
@@ -132,19 +143,15 @@ public class Songbird extends Animal implements FlyingAnimal {
 
 
     public boolean isFood(ItemStack stack) {
-        return false;
+        return stack.is(LandscapeItemTags.SONGBIRD_FOOD);
     }
 
     protected void checkFallDamage(double y, boolean onGround, BlockState state, BlockPos pos) {
     }
 
-    public boolean canMate(Animal otherAnimal) {
-        return false;
-    }
-
     @javax.annotation.Nullable
     public AgeableMob getBreedOffspring(ServerLevel level, AgeableMob otherParent) {
-        return null;
+        return LandscapeEntities.SONGBIRD.get().create(level);
     }
 
 
@@ -211,8 +218,8 @@ public class Songbird extends Animal implements FlyingAnimal {
     }
 
     static class SongbirdWanderGoal extends WaterAvoidingRandomFlyingGoal {
-        public SongbirdWanderGoal(PathfinderMob p_186224_, double p_186225_) {
-            super(p_186224_, p_186225_);
+        public SongbirdWanderGoal(PathfinderMob pathfinderMob, double d) {
+            super(pathfinderMob, d);
         }
 
         @javax.annotation.Nullable
@@ -238,7 +245,7 @@ public class Songbird extends Animal implements FlyingAnimal {
             for(BlockPos blockpos1 : BlockPos.betweenClosed(Mth.floor(this.mob.getX() - (double)3.0F), Mth.floor(this.mob.getY() - (double)6.0F), Mth.floor(this.mob.getZ() - (double)3.0F), Mth.floor(this.mob.getX() + (double)3.0F), Mth.floor(this.mob.getY() + (double)6.0F), Mth.floor(this.mob.getZ() + (double)3.0F))) {
                 if (!blockpos.equals(blockpos1)) {
                     BlockState blockstate = this.mob.level().getBlockState(blockpos$mutableblockpos1.setWithOffset(blockpos1, Direction.DOWN));
-                    boolean flag = blockstate.getBlock() instanceof LeavesBlock || blockstate.is(BlockTags.LOGS);
+                    boolean flag = blockstate.is(LandscapeBlocks.SONGBIRD_NEST) || blockstate.getBlock() instanceof LeavesBlock || blockstate.is(BlockTags.LOGS);
                     if (flag && this.mob.level().isEmptyBlock(blockpos1) && this.mob.level().isEmptyBlock(blockpos$mutableblockpos.setWithOffset(blockpos1, Direction.UP))) {
                         return Vec3.atBottomCenterOf(blockpos1);
                     }
