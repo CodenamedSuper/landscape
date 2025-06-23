@@ -1,6 +1,7 @@
 package com.codenamed.landscape.registry;
 
 import com.codenamed.landscape.Landscape;
+import com.codenamed.landscape.entity.Ant;
 import com.codenamed.landscape.entity.Songbird;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
@@ -17,6 +18,10 @@ public class LandscapeEntities {
     public static final Supplier<EntityType<Songbird>> SONGBIRD =
             ENTITY_TYPES.register("songbird", () -> EntityType.Builder.of(Songbird::new, MobCategory.CREATURE)
                     .sized(0.35f, 0.5f).build("songbird"));
+
+    public static final Supplier<EntityType<Ant>> ANT =
+            ENTITY_TYPES.register("ant", () -> EntityType.Builder.of(Ant::new, MobCategory.CREATURE)
+                    .sized(0.35f, 0.5f).build("ant"));
 
 
     public static void init(IEventBus eventBus) {

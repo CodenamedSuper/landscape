@@ -14,6 +14,13 @@ public class LandscapeItems {
             () -> new DeferredSpawnEggItem(LandscapeEntities.SONGBIRD, 0x24698c, 0xefdbb1,
                     new Item.Properties()));
 
+    public static final DeferredItem<Item> ANT_SPAWN_EGG = ITEMS.register("ant_spawn_egg",
+            () -> new DeferredSpawnEggItem(LandscapeEntities.ANT, 0x25140c, 0x593a2b,
+                    new Item.Properties()));
+
+    public static final DeferredItem<Item> ANT_EGGS = ITEMS.register("ant_eggs",
+            () -> new Item(new Item.Properties()));
+
     public static void init(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }

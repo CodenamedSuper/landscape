@@ -1,6 +1,7 @@
 package com.codenamed.landscape;
 
 
+import com.codenamed.landscape.entity.client.renderer.AntRenderer;
 import com.codenamed.landscape.entity.client.renderer.SongbirdRenderer;
 import com.codenamed.landscape.registry.*;
 import net.minecraft.client.renderer.entity.EntityRenderers;
@@ -45,8 +46,10 @@ public class Landscape
 
         LandscapeItems.init(modEventBus);
         LandscapeBlocks.init(modEventBus);
+        LandscapeDataComponentTypes.init(modEventBus);
         LandscapeBlockEntities.init(modEventBus);
         LandscapeEntities.init(modEventBus);
+        LandscapePoiTypes.init(modEventBus);
         LandscapeSoundEvents.init(modEventBus);
         LandscapeCreativeTabs.init(modEventBus);
         LandscapeFeature.init(modEventBus);
@@ -85,6 +88,8 @@ public class Landscape
         {
 
             EntityRenderers.register(LandscapeEntities.SONGBIRD.get(), SongbirdRenderer::new);
+            EntityRenderers.register(LandscapeEntities.ANT.get(), AntRenderer::new);
+
         }
     }
 

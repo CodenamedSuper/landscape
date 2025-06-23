@@ -1,0 +1,22 @@
+{
+  "variants": {
+    "nursery_age=0": {
+      "model": "landscape:block/ant_nest"
+    },
+    "nursery_age=1": {
+      "model": "landscape:block/ant_nest"
+    },
+    "nursery_age=2": {
+      "model": "landscape:block/ant_nest"
+    },
+    "nursery_age=3": {
+      "model": "landscape:block/ant_nest"
+    },
+    "nursery_age=4": {
+      "model": "landscape:block/ant_nest"
+    },
+    "nursery_age=5": {
+      "model": "landscape:block/ant_nest_eggs"
+    }
+  }
+}
