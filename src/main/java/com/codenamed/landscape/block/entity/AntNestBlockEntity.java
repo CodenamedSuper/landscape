@@ -206,76 +206,65 @@ public class AntNestBlockEntity extends BlockEntity {
             AntNestBlockEntity.Occupant occupant,
             @Nullable List<Entity> storedInNests,
             AntNestBlockEntity.AntReleaseStatus releaseStatus,
-            @Nullable BlockPos storedFlowerPos
+            @Nullable BlockPos storedLeavesPos
     ) {
         if ((level.isNight() || level.isRaining()) && releaseStatus != AntNestBlockEntity.AntReleaseStatus.EMERGENCY) {
             return false;
-        } else {
-            Direction[] directions = {Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.EAST};
-            boolean flag = false;
-            for (Direction direction : directions) {
-                BlockPos blockpos = pos.relative(direction);
+        }
 
-                if (!level.getBlockState(blockpos).getCollisionShape(level, blockpos).isEmpty()) {
-                    flag = true;
-                }
+        Direction[] directions = {Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
+        BlockPos releasePos = null;
 
-            }
-
-            BlockPos entityPos = pos;
-
-            for (Direction direction : directions) {
-
-                BlockPos blockpos = pos.relative(direction);
-
-                if (level.getBlockState(blockpos).getCollisionShape(level, blockpos).isEmpty()) {
-                    entityPos = blockpos.relative(direction);
-                }
-
-            }
-
-            if (flag && releaseStatus != AntNestBlockEntity.AntReleaseStatus.EMERGENCY) {
-                return false;
-            } else {
-                Entity entity = occupant.createEntity(level, pos);
-                if (entity != null) {
-                    if (entity instanceof Ant ant) {
-                        if (storedFlowerPos != null && !ant.hasSavedLeavesPos() && level.random.nextFloat() < 0.9F) {
-                            ant.setSavedLeavesPos(storedFlowerPos);
-                        }
-
-                        if (releaseStatus == AntNestBlockEntity.AntReleaseStatus.LEAVES_FED) {
-                            ant.dropOffLeaves();
-                            if (state.is(LandscapeBlockTags.ANT_NESTS, p_202037_ -> p_202037_.hasProperty(AntNestBlock.NURSERY_AGE))) {
-                                int i = getNurseryLevel(state);
-                                if (i < 5) {
-                                    int j = level.random.nextInt(100) == 0 ? 2 : 1;
-                                    if (i + j > 5) {
-                                        j--;
-                                    }
-
-                                    level.setBlockAndUpdate(pos, state.setValue(AntNestBlock.NURSERY_AGE, Integer.valueOf(i + j)));
-                                }
-                            }
-                        }
-
-                        if (storedInNests != null) {
-                            storedInNests.add(ant);
-                        }
-
-
-                        entity.moveTo(entityPos.getX(), entityPos.getY(),entityPos.getZ(), entity.getYRot(), entity.getXRot());
-                    }
-
-                    level.playSound(null, pos, SoundEvents.BEEHIVE_EXIT, SoundSource.BLOCKS, 1.0F, 1.0F);
-                    level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(entity, level.getBlockState(pos)));
-                    return level.addFreshEntity(entity);
-                } else {
-                    return false;
-                }
+        for (Direction direction : directions) {
+            BlockPos candidate = pos.relative(direction);
+            if (level.getBlockState(candidate).getCollisionShape(level, candidate).isEmpty()) {
+                releasePos = candidate;
+                break;
             }
         }
+
+        if (releasePos == null && releaseStatus != AntNestBlockEntity.AntReleaseStatus.EMERGENCY) {
+            return false;
+        }
+
+        if (releasePos == null) {
+            releasePos = pos;
+        }
+
+        Entity entity = occupant.createEntity(level, pos);
+        if (entity instanceof Ant ant) {
+            if (storedLeavesPos != null && !ant.hasSavedLeavesPos() && level.random.nextFloat() < 0.9F) {
+                ant.setSavedLeavesPos(storedLeavesPos);
+            }
+
+            if (releaseStatus == AntNestBlockEntity.AntReleaseStatus.LEAVES_FED) {
+                ant.dropOffLeaves();
+                if (state.is(LandscapeBlockTags.ANT_NESTS, p -> p.hasProperty(AntNestBlock.NURSERY_AGE))) {
+                    int i = getNurseryLevel(state);
+                    if (i < 5) {
+                        int j = level.random.nextInt(100) == 0 ? 2 : 1;
+                        if (i + j > 5) {
+                            j--;
+                        }
+                        level.setBlockAndUpdate(pos, state.setValue(AntNestBlock.NURSERY_AGE, i + j));
+                    }
+                }
+            }
+
+            if (storedInNests != null) {
+                storedInNests.add(ant);
+            }
+        }
+
+        entity.moveTo(releasePos.getX() + 0.5, releasePos.getY(), releasePos.getZ() + 0.5, entity.getYRot(), entity.getXRot());
+
+
+
+        level.playSound(null, pos, SoundEvents.BEEHIVE_EXIT, SoundSource.BLOCKS, 1.0F, 1.0F);
+        level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(entity, level.getBlockState(pos)));
+        return level.addFreshEntity(entity);
     }
+
 
     private boolean hasSavedLeavesPos() {
         return this.savedLeavesPos != null;
@@ -432,12 +421,10 @@ public class AntNestBlockEntity extends BlockEntity {
             AntNestBlockEntity.IGNORED_ANT_TAGS.forEach(compoundtag::remove);
             Entity entity = EntityType.loadEntityRecursive(compoundtag, level, p_331097_ -> p_331097_);
             if (entity != null && entity.getType().is(LandscapeEntityTypeTags.ANT_NEST_INHABITORS)) {
-                entity.setNoGravity(true);
                 if (entity instanceof Ant ant) {
                     ant.setNestPos(pos);
                     setAntReleaseData(this.ticksInNest, ant);
                 }
-
                 return entity;
             } else {
                 return null;

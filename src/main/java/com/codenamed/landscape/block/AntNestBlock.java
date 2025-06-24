@@ -122,7 +122,7 @@ public class AntNestBlock extends BaseEntityBlock {
     }
 
     public static void dropAntEggs(Level level, BlockPos pos) {
-        popResource(level, pos, new ItemStack(LandscapeItems.ANT_EGGS.get(), 3));
+        popResource(level, pos, new ItemStack(LandscapeItems.ANT_EGGS.get(), 1));
     }
 
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
@@ -131,11 +131,12 @@ public class AntNestBlock extends BaseEntityBlock {
         if (i >= 5) {
             Item item = stack.getItem();
             if (stack.canPerformAction(ItemAbilities.BRUSH_BRUSH)) {
-                level.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.BRUSH_SAND, SoundSource.BLOCKS, 1.0F, 1.0F);
+                level.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.ARMADILLO_BRUSH, SoundSource.BLOCKS, 1.0F, 1.0F);
                 dropAntEggs(level, pos);
-                stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
+                stack.hurtAndBreak(16, player, LivingEntity.getSlotForHand(hand));
+                resetNurseryAge(level, state, pos);
                 flag = true;
-                level.gameEvent(player, GameEvent.SHEAR, pos);
+                level.gameEvent(player, GameEvent.ITEM_INTERACT_FINISH, pos);
 
                 if (!level.isClientSide() && flag) {
                     player.awardStat(Stats.ITEM_USED.get(item));

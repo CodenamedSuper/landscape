@@ -476,7 +476,7 @@ public class Ant extends Animal implements NeutralMob {
     }
 
     boolean isLeavesValid(BlockPos pos) {
-        return this.level().isLoaded(pos) && this.level().getBlockState(pos).is(BlockTags.FLOWERS);
+        return this.level().isLoaded(pos) && this.level().getBlockState(pos).is(BlockTags.LEAVES);
     }
 
 
@@ -901,8 +901,8 @@ public class Ant extends Animal implements NeutralMob {
         private final Predicate<BlockState> VALID_POLLINATION_BLOCKS = p_28074_ -> {
             if (p_28074_.hasProperty(BlockStateProperties.WATERLOGGED) && p_28074_.getValue(BlockStateProperties.WATERLOGGED)) {
                 return false;
-            } else if (p_28074_.is(BlockTags.FLOWERS)) {
-                return p_28074_.is(Blocks.SUNFLOWER) ? p_28074_.getValue(DoublePlantBlock.HALF) == DoubleBlockHalf.UPPER : true;
+            } else if (p_28074_.is(BlockTags.LEAVES)) {
+                return true;
             } else {
                 return false;
             }
