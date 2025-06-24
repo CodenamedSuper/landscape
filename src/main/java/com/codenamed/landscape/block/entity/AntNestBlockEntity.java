@@ -156,7 +156,7 @@ public class AntNestBlockEntity extends BlockEntity {
         return this.stored.size();
     }
 
-    public static int getHoneyLevel(BlockState state) {
+    public static int getNurseryLevel(BlockState state) {
         return state.getValue(AntNestBlock.NURSERY_AGE);
     }
 
@@ -204,7 +204,7 @@ public class AntNestBlockEntity extends BlockEntity {
             BlockPos pos,
             BlockState state,
             AntNestBlockEntity.Occupant occupant,
-            @Nullable List<Entity> storedInHives,
+            @Nullable List<Entity> storedInNests,
             AntNestBlockEntity.AntReleaseStatus releaseStatus,
             @Nullable BlockPos storedFlowerPos
     ) {
@@ -229,7 +229,7 @@ public class AntNestBlockEntity extends BlockEntity {
                 BlockPos blockpos = pos.relative(direction);
 
                 if (level.getBlockState(blockpos).getCollisionShape(level, blockpos).isEmpty()) {
-                    entityPos = blockpos;
+                    entityPos = blockpos.relative(direction);
                 }
 
             }
@@ -246,8 +246,8 @@ public class AntNestBlockEntity extends BlockEntity {
 
                         if (releaseStatus == AntNestBlockEntity.AntReleaseStatus.LEAVES_FED) {
                             ant.dropOffLeaves();
-                            if (state.is(BlockTags.BEEHIVES, p_202037_ -> p_202037_.hasProperty(AntNestBlock.NURSERY_AGE))) {
-                                int i = getHoneyLevel(state);
+                            if (state.is(LandscapeBlockTags.ANT_NESTS, p_202037_ -> p_202037_.hasProperty(AntNestBlock.NURSERY_AGE))) {
+                                int i = getNurseryLevel(state);
                                 if (i < 5) {
                                     int j = level.random.nextInt(100) == 0 ? 2 : 1;
                                     if (i + j > 5) {
@@ -259,8 +259,8 @@ public class AntNestBlockEntity extends BlockEntity {
                             }
                         }
 
-                        if (storedInHives != null) {
-                            storedInHives.add(ant);
+                        if (storedInNests != null) {
+                            storedInNests.add(ant);
                         }
 
 
