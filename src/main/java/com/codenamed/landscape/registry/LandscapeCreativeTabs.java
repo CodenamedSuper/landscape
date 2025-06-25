@@ -19,15 +19,11 @@ public class LandscapeCreativeTabs {
                     .title(Component.translatable("creativetab.landscape.landscape"))
                     .displayItems((itemDisplayParameters, output) -> {
 
-                        output.accept(LandscapeBlocks.ANT_SOIL);
-                        output.accept(LandscapeBlocks.ANT_NEST);
                         output.accept(LandscapeBlocks.WHITE_MUSHROOM_BlOCK);
                         output.accept(LandscapeBlocks.WHITE_MUSHROOM);
                         output.accept(LandscapeBlocks.TRILLIUM);
                         output.accept(LandscapeBlocks.SONGBIRD_NEST);
-                        output.accept(LandscapeItems.ANT_EGGS);
                         output.accept(LandscapeItems.SONGBIRD_SPAWN_EGG);
-                        output.accept(LandscapeItems.ANT_SPAWN_EGG);
 
 
                     }).build());

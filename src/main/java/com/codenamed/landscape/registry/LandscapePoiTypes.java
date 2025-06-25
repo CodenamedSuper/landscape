@@ -20,10 +20,6 @@ public class LandscapePoiTypes {
     public static final DeferredRegister<PoiType> POI_TYPES =
             DeferredRegister.create(BuiltInRegistries.POINT_OF_INTEREST_TYPE, Landscape.MOD_ID);
 
-    public static final Holder<PoiType> ANT_NEST = POI_TYPES.register("ant_nest",
-            () -> new PoiType(ImmutableSet.copyOf(LandscapeBlocks.ANT_NEST.get().getStateDefinition().getPossibleStates()),
-                    0, 1));
-
     public static void init(IEventBus eventBus) {
         POI_TYPES.register(eventBus);
     }

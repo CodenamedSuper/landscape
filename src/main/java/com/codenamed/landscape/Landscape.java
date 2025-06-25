@@ -1,17 +1,9 @@
 package com.codenamed.landscape;
 
 
-import com.codenamed.landscape.entity.client.renderer.AntRenderer;
 import com.codenamed.landscape.entity.client.renderer.SongbirdRenderer;
 import com.codenamed.landscape.registry.*;
 import net.minecraft.client.renderer.entity.EntityRenderers;
-import net.minecraft.tags.BiomeTags;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
-import net.minecraft.world.level.biome.Climate;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.levelgen.SurfaceRules;
-import net.minecraft.world.level.levelgen.material.MaterialRuleList;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -28,9 +20,6 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
-
-import static net.minecraft.data.models.blockstates.Condition.condition;
-import static net.minecraft.world.level.levelgen.SurfaceRules.*;
 
 @Mod(Landscape.MOD_ID)
 public class Landscape
@@ -88,7 +77,6 @@ public class Landscape
         {
 
             EntityRenderers.register(LandscapeEntities.SONGBIRD.get(), SongbirdRenderer::new);
-            EntityRenderers.register(LandscapeEntities.ANT.get(), AntRenderer::new);
 
         }
     }

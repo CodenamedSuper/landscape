@@ -10,14 +10,6 @@
   "item.landscape.songbird_spawn_egg": "Songbird Spawn Egg",
   "entity.landscape.songbird": "Songbird",
 
-  "item.landscape.ant_spawn_egg": "Ant Spawn Egg",
-  "entity.landscape.ant": "Ant",
-
-  "block.landscape.ant_soil": "Ant Soil",
-  "block.landscape.ant_nest": "Ant Nest",
-  "item.landscape.ant_eggs": "Ant Eggs",
-
-
   "subtitles.entity.songbird.ambient": "Songbird chirping"
 
 }

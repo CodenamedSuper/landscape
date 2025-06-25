@@ -1,7 +1,6 @@
 package com.codenamed.landscape.registry;
 
 import com.codenamed.landscape.Landscape;
-import com.codenamed.landscape.block.entity.AntNestBlockEntity;
 import com.codenamed.landscape.block.entity.SongbirdNestBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -15,10 +14,6 @@ public class LandscapeBlockEntities {
 
     public static final Supplier<BlockEntityType<SongbirdNestBlockEntity>> SONGBIRD_NEST = BLOCK_ENTITIES.register("songbird_nest",
             () -> BlockEntityType.Builder.of(SongbirdNestBlockEntity::new, LandscapeBlocks.SONGBIRD_NEST.get()).build(null));
-
-
-    public static final Supplier<BlockEntityType<AntNestBlockEntity>> ANT_NEST = BLOCK_ENTITIES.register("ant_nest",
-            () -> BlockEntityType.Builder.of(AntNestBlockEntity::new, LandscapeBlocks.ANT_NEST.get()).build(null));
 
     public static void init(IEventBus eventBus) {
         BLOCK_ENTITIES.register(eventBus);
