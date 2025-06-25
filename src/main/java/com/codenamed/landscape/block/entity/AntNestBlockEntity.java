@@ -279,7 +279,7 @@ public class AntNestBlockEntity extends BlockEntity {
         while (iterator.hasNext()) {
             AntNestBlockEntity.AntData antNestblockentity$antdata = iterator.next();
             if (antNestblockentity$antdata.tick()) {
-                AntNestBlockEntity.AntReleaseStatus antNestblockentity$antreleasestatus = antNestblockentity$antdata.hasLeaves()
+                AntNestBlockEntity.AntReleaseStatus antNestblockentity$antreleasestatus = antNestblockentity$antdata.hasEnoughLeaves()
                         ? AntNestBlockEntity.AntReleaseStatus.LEAVES_FED
                         : AntNestBlockEntity.AntReleaseStatus.BEE_RELEASED;
                 if (releaseOccupant(
@@ -370,8 +370,8 @@ public class AntNestBlockEntity extends BlockEntity {
             return new AntNestBlockEntity.Occupant(this.occupant.entityData, this.ticksInHive, this.occupant.minTicksInHive);
         }
 
-        public boolean hasLeaves() {
-            return this.occupant.entityData.getUnsafe().getBoolean("HasLeaves");
+        public boolean hasEnoughLeaves() {
+            return this.occupant.entityData.getUnsafe().getBoolean("HasEnoughLeaves");
         }
     }
 
@@ -405,7 +405,7 @@ public class AntNestBlockEntity extends BlockEntity {
             CompoundTag compoundtag = new CompoundTag();
             entity.save(compoundtag);
             AntNestBlockEntity.IGNORED_ANT_TAGS.forEach(compoundtag::remove);
-            boolean flag = compoundtag.getBoolean("HasLeaves");
+            boolean flag = compoundtag.getBoolean("HasEnoughLeaves");
             return new AntNestBlockEntity.Occupant(CustomData.of(compoundtag), 0, flag ? 2400 : 600);
         }
 

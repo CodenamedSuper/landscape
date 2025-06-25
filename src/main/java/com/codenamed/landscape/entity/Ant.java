@@ -63,6 +63,7 @@ import net.minecraft.world.entity.ai.util.HoverRandomPos;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
 import net.minecraft.world.entity.ai.village.poi.PoiRecord;
 import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -169,7 +170,7 @@ public class Ant extends Animal implements NeutralMob {
             compound.put("leaves_pos", NbtUtils.writeBlockPos(this.getSavedLeavesPos()));
         }
 
-        compound.putBoolean("HasLeaves", this.hasLeaves());
+        compound.putBoolean("HasEnoughLeaves", this.hasEnoughLeaves());
         compound.putInt("TicksSinceCollectLeaves", this.ticksWithoutLeavesSinceExitingNest);
         compound.putInt("CannotEnterNestTicks", this.stayOutOfNestCountdown);
         compound.putInt("CollectedLeaves", this.collectedLeavesCount);
@@ -185,7 +186,7 @@ public class Ant extends Animal implements NeutralMob {
         this.nestPos = NbtUtils.readBlockPos(compound, "nest_pos").orElse(null);
         this.savedLeavesPos = NbtUtils.readBlockPos(compound, "leaves_pos").orElse(null);
         super.readAdditionalSaveData(compound);
-        this.setHasLeaves(compound.getBoolean("HasLeaves"));
+        this.setHasEnoughLeaves(compound.getBoolean("HasEnoughLeaves"));
         this.setHasStung(compound.getBoolean("HasStung"));
         this.ticksWithoutLeavesSinceExitingNest = compound.getInt("TicksSinceCollectLeaves");
         this.stayOutOfNestCountdown = compound.getInt("CannotEnterNestTicks");
@@ -267,7 +268,7 @@ public class Ant extends Animal implements NeutralMob {
 
     boolean wantsToEnterNest() {
         if (this.stayOutOfNestCountdown <= 0 && !this.antCollectLeavesGoal.isCollectLeavesing() && !this.hasStung() && this.getTarget() == null) {
-            boolean flag = this.isTiredOfLookingForLeaves() || this.level().isRaining() || this.level().isNight() || this.hasLeaves();
+            boolean flag = this.isTiredOfLookingForLeaves() || this.level().isRaining() || this.level().isNight() || this.hasEnoughLeaves();
             return flag && !this.isNestNearFire();
         } else {
             return false;
@@ -303,7 +304,7 @@ public class Ant extends Animal implements NeutralMob {
             }
         }
 
-        if (!this.hasLeaves()) {
+        if (!this.hasEnoughLeaves()) {
             this.ticksWithoutLeavesSinceExitingNest++;
         }
 
@@ -412,16 +413,16 @@ public class Ant extends Animal implements NeutralMob {
         }
     }
 
-    public boolean hasLeaves() {
+    public boolean hasEnoughLeaves() {
         return this.getFlag(8);
     }
 
-    void setHasLeaves(boolean hasLeaves) {
-        if (hasLeaves) {
+    void setHasEnoughLeaves(boolean hasEnoughLeaves) {
+        if (hasEnoughLeaves) {
             this.resetTicksWithoutLeavesSinceExitingNest();
         }
 
-        this.setFlag(8, hasLeaves);
+        this.setFlag(8, hasEnoughLeaves);
     }
 
     public boolean hasStung() {
@@ -501,7 +502,7 @@ public class Ant extends Animal implements NeutralMob {
     }
     
     public void dropOffLeaves() {
-        this.setHasLeaves(false);
+        this.setHasEnoughLeaves(false);
     }
 
     /**
@@ -635,7 +636,7 @@ public class Ant extends Animal implements NeutralMob {
                 antNestBlockEntity.addOccupant(Ant.this);
 
                 Ant.this.collectedLeavesCount = 0;
-                Ant.this.setHasLeaves(false);
+                Ant.this.setHasEnoughLeaves(false);
             }
 
         }
@@ -929,7 +930,7 @@ public class Ant extends Animal implements NeutralMob {
         public boolean canAntUse() {
             if (Ant.this.remainingCooldownBeforeLocatingNewLeaves > 0) {
                 return false;
-            } else if (Ant.this.hasLeaves()) {
+            } else if (Ant.this.hasEnoughLeaves()) {
                 return false;
             } else if (Ant.this.level().isRaining()) {
                 return false;
@@ -994,17 +995,17 @@ public class Ant extends Animal implements NeutralMob {
         @Override
         public void stop() {
             if (this.hasCollectedLeavesLongEnough()) {
-                Ant.this.setHasLeaves(true);
+                Ant.this.setHasEnoughLeaves(true);
                 Ant.this.collectedLeavesCount++;
 
                 if (Ant.this.savedLeavesPos != null && Ant.this.level().getBlockState(Ant.this.savedLeavesPos).is(BlockTags.LEAVES)) {
-                    Ant.this.level().destroyBlock(Ant.this.savedLeavesPos, false); // break the leaves block without drops
+                    Ant.this.level().destroyBlock(Ant.this.savedLeavesPos, false);
                 }
 
                 if (Ant.this.collectedLeavesCount >= LEAVES_TO_COLLECT_BEFORE_RETURN) {
-                    Ant.this.setHasLeaves(true); // Mark as ready to return to nest
+                    Ant.this.setHasEnoughLeaves(true);
                 } else {
-                    Ant.this.setHasLeaves(false); // Ready to keep collecting
+                    Ant.this.setHasEnoughLeaves(false);
                 }
             }
             this.collectingLeaves = false;
@@ -1043,9 +1044,9 @@ public class Ant extends Animal implements NeutralMob {
                 Ant.this.collectedLeavesCount++;
 
                 if (Ant.this.collectedLeavesCount >= LEAVES_TO_COLLECT_BEFORE_RETURN) {
-                    Ant.this.setHasLeaves(true); // Go back to nest
+                    Ant.this.setHasEnoughLeaves(true);
                 } else {
-                    Ant.this.setHasLeaves(false); // Keep going
+                    Ant.this.setHasEnoughLeaves(false);
                 }
 
                 Ant.this.savedLeavesPos = null;
@@ -1092,6 +1093,7 @@ public class Ant extends Animal implements NeutralMob {
             return Optional.empty();
         }
     }
+
 
     class AntWanderGoal extends Goal {
         private static final int WANDER_THRESHOLD = 22;
