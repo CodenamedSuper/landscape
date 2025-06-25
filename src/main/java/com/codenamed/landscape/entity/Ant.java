@@ -90,8 +90,11 @@ public class Ant extends Animal implements NeutralMob {
     private static final EntityDataAccessor<Byte> DATA_FLAGS_ID = SynchedEntityData.defineId(Ant.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<Integer> DATA_REMAINING_ANGER_TIME = SynchedEntityData.defineId(Ant.class, EntityDataSerializers.INT);
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(20, 39);
+    private static final int LEAVES_TO_COLLECT_BEFORE_RETURN = 5;
+
     @Nullable
     private UUID persistentAngerTarget;
+    private int collectedLeavesCount = 0;
     private float rollAmount;
     private float rollAmountO;
     private int timeSinceSting;
@@ -105,7 +108,7 @@ public class Ant extends Animal implements NeutralMob {
     BlockPos savedLeavesPos;
     @Nullable
     BlockPos nestPos;
-    Ant.AntHarvestGoal antHarvestGoal;
+    Ant.AntCollectLeavesGoal antCollectLeavesGoal;
     Ant.AntGoToNestGoal goToNestGoal;
     private Ant.AntGoToKnownLeavesGoal goToKnownLeavesGoal;
     private int underWaterTicks;
@@ -140,8 +143,8 @@ public class Ant extends Animal implements NeutralMob {
         this.goalSelector.addGoal(0, new Ant.AntAttackGoal(this, 1.4F, true));
         this.goalSelector.addGoal(1, new Ant.AntEnterNestGoal());
         this.goalSelector.addGoal(2, new TemptGoal(this, 1.25, p_335831_ -> p_335831_.is(ItemTags.LEAVES), false));
-        this.antHarvestGoal = new Ant.AntHarvestGoal();
-        this.goalSelector.addGoal(3, this.antHarvestGoal);
+        this.antCollectLeavesGoal = new Ant.AntCollectLeavesGoal();
+        this.goalSelector.addGoal(3, this.antCollectLeavesGoal);
         this.goalSelector.addGoal(4, new FollowParentGoal(this, 1.25));
         this.goalSelector.addGoal(4, new Ant.AntLocateNestGoal());
         this.goToNestGoal = new Ant.AntGoToNestGoal();
@@ -167,8 +170,10 @@ public class Ant extends Animal implements NeutralMob {
         }
 
         compound.putBoolean("HasLeaves", this.hasLeaves());
-        compound.putInt("TicksSinceHarvest", this.ticksWithoutLeavesSinceExitingNest);
+        compound.putInt("TicksSinceCollectLeaves", this.ticksWithoutLeavesSinceExitingNest);
         compound.putInt("CannotEnterNestTicks", this.stayOutOfNestCountdown);
+        compound.putInt("CollectedLeaves", this.collectedLeavesCount);
+
         this.addPersistentAngerSaveData(compound);
     }
 
@@ -182,8 +187,9 @@ public class Ant extends Animal implements NeutralMob {
         super.readAdditionalSaveData(compound);
         this.setHasLeaves(compound.getBoolean("HasLeaves"));
         this.setHasStung(compound.getBoolean("HasStung"));
-        this.ticksWithoutLeavesSinceExitingNest = compound.getInt("TicksSinceHarvest");
+        this.ticksWithoutLeavesSinceExitingNest = compound.getInt("TicksSinceCollectLeaves");
         this.stayOutOfNestCountdown = compound.getInt("CannotEnterNestTicks");
+        this.collectedLeavesCount = compound.getInt("CollectedLeaves");
         this.readPersistentAngerSaveData(this.level(), compound);
     }
 
@@ -260,7 +266,7 @@ public class Ant extends Animal implements NeutralMob {
     }
 
     boolean wantsToEnterNest() {
-        if (this.stayOutOfNestCountdown <= 0 && !this.antHarvestGoal.isHarvesting() && !this.hasStung() && this.getTarget() == null) {
+        if (this.stayOutOfNestCountdown <= 0 && !this.antCollectLeavesGoal.isCollectLeavesing() && !this.hasStung() && this.getTarget() == null) {
             boolean flag = this.isTiredOfLookingForLeaves() || this.level().isRaining() || this.level().isNight() || this.hasLeaves();
             return flag && !this.isNestNearFire();
         } else {
@@ -507,7 +513,7 @@ public class Ant extends Animal implements NeutralMob {
             return false;
         } else {
             if (!this.level().isClientSide) {
-                this.antHarvestGoal.stopHarvesting();
+                this.antCollectLeavesGoal.stopCollectLeavesing();
             }
 
             return super.hurt(source, amount);
@@ -627,7 +633,11 @@ public class Ant extends Animal implements NeutralMob {
         public void start() {
             if (Ant.this.level().getBlockEntity(Ant.this.nestPos) instanceof AntNestBlockEntity antNestBlockEntity) {
                 antNestBlockEntity.addOccupant(Ant.this);
+
+                Ant.this.collectedLeavesCount = 0;
+                Ant.this.setHasLeaves(false);
             }
+
         }
     }
 
@@ -681,7 +691,6 @@ public class Ant extends Animal implements NeutralMob {
                 this.travellingTicks++;
 
                 if (this.travellingTicks > this.adjustedTickDelay(MAX_TRAVELLING_TICKS)) {
-                    System.out.println("Gave up trying to reach nest after max ticks");
                     this.dropAndBlacklistNest();
                     return;
                 }
@@ -689,7 +698,6 @@ public class Ant extends Animal implements NeutralMob {
                 if (!Ant.this.navigation.isInProgress()) {
                     if (!Ant.this.closerThan(Ant.this.nestPos, 16)) {
                         if (Ant.this.isTooFarAway(Ant.this.nestPos)) {
-                            System.out.println("Nest too far. Dropping it.");
                             this.dropNest();
                             return;
                         }
@@ -697,10 +705,8 @@ public class Ant extends Animal implements NeutralMob {
                     } else {
                         boolean success = this.pathfindDirectlyTowards(Ant.this.nestPos);
                         if (!success) {
-                            System.out.println("Failed to path to nearby nest. Not blacklisting immediately.");
                             this.ticksStuck++;
                             if (this.ticksStuck > 100) { // was 60
-                                System.out.println("Still stuck, finally dropping nest.");
                                 this.dropNest();
                                 this.ticksStuck = 0;
                             }
@@ -845,22 +851,17 @@ public class Ant extends Animal implements NeutralMob {
 
         @Override
         public void start() {
-            System.out.println("[Ant] Trying to locate nest...");
             Ant.this.remainingCooldownBeforeLocatingNewNest = COOLDOWN_BEFORE_LOCATING_NEW_NEST;
             List<BlockPos> list = this.findNearbyNestsWithSpace();
             if (!list.isEmpty()) {
                 for (BlockPos pos : list) {
                     if (!Ant.this.goToNestGoal.isTargetBlacklisted(pos)) {
                         Ant.this.nestPos = pos;
-                        System.out.println("[Ant] Found new nest at: " + pos);
                         return;
                     }
                 }
                 Ant.this.goToNestGoal.clearBlacklist();
                 Ant.this.nestPos = list.get(0);
-                System.out.println("[Ant] All targets blacklisted, using first: " + list.get(0));
-            } else {
-                System.out.println("[Ant] No nest found in range.");
             }
         }
 
@@ -890,11 +891,11 @@ public class Ant extends Animal implements NeutralMob {
 
         @Override
         protected boolean resetXRotOnTick() {
-            return !Ant.this.antHarvestGoal.isHarvesting();
+            return !Ant.this.antCollectLeavesGoal.isCollectLeavesing();
         }
     }
 
-    class AntHarvestGoal extends Ant.BaseAntGoal {
+    class AntCollectLeavesGoal extends Ant.BaseAntGoal {
         private static final int MIN_POLLINATION_TICKS = 400;
         private static final int MIN_FIND_FLOWER_RETRY_COOLDOWN = 20;
         private static final int MAX_FIND_FLOWER_RETRY_COOLDOWN = 60;
@@ -912,15 +913,15 @@ public class Ant extends Animal implements NeutralMob {
         private static final float SPEED_MODIFIER = 0.35F;
         private static final float HOVER_HEIGHT_WITHIN_FLOWER = 0.6F;
         private static final float HOVER_POS_OFFSET = 0.33333334F;
-        private int successfulPollinatingTicks;
+        private int successfulCollectingLeavesTicks;
         private int lastSoundPlayedTick;
-        private boolean pollinating;
+        private boolean collectingLeaves;
         @Nullable
         private Vec3 hoverPos;
-        private int pollinatingTicks;
+        private int collectingLeavesTicks;
         private static final int MAX_POLLINATING_TICKS = 600;
 
-        AntHarvestGoal() {
+        AntCollectLeavesGoal() {
             this.setFlags(EnumSet.of(Goal.Flag.MOVE));
         }
 
@@ -953,13 +954,13 @@ public class Ant extends Animal implements NeutralMob {
 
         @Override
         public boolean canAntContinueToUse() {
-            if (!this.pollinating) {
+            if (!this.collectingLeaves) {
                 return false;
             } else if (!Ant.this.hasSavedLeavesPos()) {
                 return false;
             } else if (Ant.this.level().isRaining()) {
                 return false;
-            } else if (this.hasHarvestedLongEnough()) {
+            } else if (this.hasCollectedLeavesLongEnough()) {
                 return Ant.this.random.nextFloat() < 0.2F;
             } else if (Ant.this.tickCount % 20 == 0 && !Ant.this.isLeavesValid(Ant.this.savedLeavesPos)) {
                 Ant.this.savedLeavesPos = null;
@@ -969,36 +970,46 @@ public class Ant extends Animal implements NeutralMob {
             }
         }
 
-        private boolean hasHarvestedLongEnough() {
-            return this.successfulPollinatingTicks > 400;
+        private boolean hasCollectedLeavesLongEnough() {
+            return this.successfulCollectingLeavesTicks > 400;
         }
 
-        boolean isHarvesting() {
-            return this.pollinating;
+        boolean isCollectLeavesing() {
+            return this.collectingLeaves;
         }
 
-        void stopHarvesting() {
-            this.pollinating = false;
+        void stopCollectLeavesing() {
+            this.collectingLeaves = false;
         }
 
         @Override
         public void start() {
-            this.successfulPollinatingTicks = 0;
-            this.pollinatingTicks = 0;
+            this.successfulCollectingLeavesTicks = 0;
+            this.collectingLeavesTicks = 0;
             this.lastSoundPlayedTick = 0;
-            this.pollinating = true;
+            this.collectingLeaves = true;
             Ant.this.resetTicksWithoutLeavesSinceExitingNest();
         }
 
         @Override
         public void stop() {
-            if (this.hasHarvestedLongEnough()) {
+            if (this.hasCollectedLeavesLongEnough()) {
                 Ant.this.setHasLeaves(true);
-            }
+                Ant.this.collectedLeavesCount++;
 
-            this.pollinating = false;
+                if (Ant.this.savedLeavesPos != null && Ant.this.level().getBlockState(Ant.this.savedLeavesPos).is(BlockTags.LEAVES)) {
+                    Ant.this.level().destroyBlock(Ant.this.savedLeavesPos, false); // break the leaves block without drops
+                }
+
+                if (Ant.this.collectedLeavesCount >= LEAVES_TO_COLLECT_BEFORE_RETURN) {
+                    Ant.this.setHasLeaves(true); // Mark as ready to return to nest
+                } else {
+                    Ant.this.setHasLeaves(false); // Ready to keep collecting
+                }
+            }
+            this.collectingLeaves = false;
             Ant.this.navigation.stop();
-            Ant.this.remainingCooldownBeforeLocatingNewLeaves = 200;
+            Ant.this.remainingCooldownBeforeLocatingNewLeaves = 0;
         }
 
         @Override
@@ -1008,49 +1019,45 @@ public class Ant extends Animal implements NeutralMob {
 
         @Override
         public void tick() {
-            this.pollinatingTicks++;
-            if (this.pollinatingTicks > 600) {
+            this.collectingLeavesTicks++;
+
+            if (Ant.this.savedLeavesPos == null) {
+                this.collectingLeaves = false;
+                return;
+            }
+
+            BlockState state = Ant.this.level().getBlockState(Ant.this.savedLeavesPos);
+            if (!state.is(BlockTags.LEAVES)) {
                 Ant.this.savedLeavesPos = null;
-            } else {
-                Vec3 vec3 = Vec3.atBottomCenterOf(Ant.this.savedLeavesPos).add(0.0, 0.6F, 0.0);
-                if (vec3.distanceTo(Ant.this.position()) > 1.0) {
-                    this.hoverPos = vec3;
-                    this.setWantedPos();
+                this.collectingLeaves = false;
+                return;
+            }
+
+            Vec3 targetVec = Vec3.atBottomCenterOf(Ant.this.savedLeavesPos).add(0, 0.6F, 0);
+
+            Ant.this.getMoveControl().setWantedPosition(targetVec.x(), targetVec.y(), targetVec.z(), 0.35F);
+            Ant.this.getLookControl().setLookAt(targetVec.x(), targetVec.y(), targetVec.z());
+
+            if (Ant.this.position().distanceTo(targetVec) < 1.0D) {
+                Ant.this.level().destroyBlock(Ant.this.savedLeavesPos, false);
+                Ant.this.collectedLeavesCount++;
+
+                if (Ant.this.collectedLeavesCount >= LEAVES_TO_COLLECT_BEFORE_RETURN) {
+                    Ant.this.setHasLeaves(true); // Go back to nest
                 } else {
-                    if (this.hoverPos == null) {
-                        this.hoverPos = vec3;
-                    }
-
-                    boolean flag = Ant.this.position().distanceTo(this.hoverPos) <= 0.1;
-                    boolean flag1 = true;
-                    if (!flag && this.pollinatingTicks > 600) {
-                        Ant.this.savedLeavesPos = null;
-                    } else {
-                        if (flag) {
-                            boolean flag2 = Ant.this.random.nextInt(25) == 0;
-                            if (flag2) {
-                                this.hoverPos = new Vec3(vec3.x() + (double)this.getOffset(), vec3.y(), vec3.z() + (double)this.getOffset());
-                                Ant.this.navigation.stop();
-                            } else {
-                                flag1 = false;
-                            }
-
-                            Ant.this.getLookControl().setLookAt(vec3.x(), vec3.y(), vec3.z());
-                        }
-
-                        if (flag1) {
-                            this.setWantedPos();
-                        }
-
-                        this.successfulPollinatingTicks++;
-                        if (Ant.this.random.nextFloat() < 0.05F && this.successfulPollinatingTicks > this.lastSoundPlayedTick + 60) {
-                            this.lastSoundPlayedTick = this.successfulPollinatingTicks;
-                            Ant.this.playSound(SoundEvents.BEE_POLLINATE, 1.0F, 1.0F);
-                        }
-                    }
+                    Ant.this.setHasLeaves(false); // Keep going
                 }
+
+                Ant.this.savedLeavesPos = null;
+                Ant.this.navigation.stop();
+                this.collectingLeaves = false;
+                Ant.this.remainingCooldownBeforeLocatingNewLeaves = 0;
+
+                Ant.this.goalSelector.tick();
             }
         }
+
+
 
         private void setWantedPos() {
             Ant.this.getMoveControl().setWantedPosition(this.hoverPos.x(), this.hoverPos.y(), this.hoverPos.z(), 0.35F);
