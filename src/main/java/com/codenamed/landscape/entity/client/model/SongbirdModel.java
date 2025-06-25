@@ -71,18 +71,14 @@ public class SongbirdModel<T extends Songbird> extends HierarchicalModel<T> {
         return LayerDefinition.create(meshdefinition, 48, 48);
     }
 
+
     @Override
     public void setupAnim(Songbird songbird, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+
         this.root().getAllParts().forEach(ModelPart::resetPose);
         this.applyHeadRotation(netHeadYaw, headPitch);
 
-        if (songbird.isSleeping()) {
-            this.animate(songbird.sleepIdleState, SongbirdAnimations.SLEEP, ageInTicks);
-        } else if (songbird.isFlying()) {
-            this.animate(songbird.flyIdleState, SongbirdAnimations.FLY, ageInTicks);
-        } else {
-            this.animate(songbird.idleState, SongbirdAnimations.IDLE, ageInTicks);
-        }
+        this.animateWalk(SongbirdAnimations.FLY, limbSwing, limbSwingAmount, 3f, 2.5f);
     }
 
     private void applyHeadRotation(float headYaw, float headPitch) {

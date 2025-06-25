@@ -1,8 +1,6 @@
 {
   "replace": false,
   "values": [
-    "landscape:white_mushroom_block",
-    "landscape:songbird_nest"
-
+    "landscape:white_mushroom_block"
   ]
 }

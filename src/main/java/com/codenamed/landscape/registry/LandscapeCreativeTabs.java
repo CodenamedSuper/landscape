@@ -22,7 +22,6 @@ public class LandscapeCreativeTabs {
                         output.accept(LandscapeBlocks.WHITE_MUSHROOM_BlOCK);
                         output.accept(LandscapeBlocks.WHITE_MUSHROOM);
                         output.accept(LandscapeBlocks.TRILLIUM);
-                        output.accept(LandscapeBlocks.SONGBIRD_NEST);
                         output.accept(LandscapeItems.SONGBIRD_SPAWN_EGG);
 
 
