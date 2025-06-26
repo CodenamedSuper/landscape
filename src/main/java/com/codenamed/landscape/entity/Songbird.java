@@ -85,12 +85,6 @@ public class Songbird extends Animal implements FlyingAnimal {
         this.setPathfindingMalus(PathType.COCOA, -1.0F);
     }
 
-    @javax.annotation.Nullable
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @javax.annotation.Nullable SpawnGroupData spawnGroupData) {
-
-        return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
-    }
-
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(2, new BreedGoal(this, 1.0));
@@ -165,7 +159,7 @@ public class Songbird extends Animal implements FlyingAnimal {
 
     @Override
     protected SoundEvent getAmbientSound() {
-        return this.isAlive() ? LandscapeSoundEvents.SONGBIRD_AMBIENT.get() : null;
+        return (this.isAlive() && !level().isNight())  ? LandscapeSoundEvents.SONGBIRD_AMBIENT.get() : null;
     }
 
     @Override
