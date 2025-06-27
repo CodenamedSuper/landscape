@@ -159,7 +159,7 @@ public class Songbird extends Animal implements FlyingAnimal {
 
     @Override
     protected SoundEvent getAmbientSound() {
-        return (this.isAlive() && !level().isNight())  ? LandscapeSoundEvents.SONGBIRD_AMBIENT.get() : null;
+        return (this.isAlive() && (!level().isNight() || !level().isRaining())  ? LandscapeSoundEvents.SONGBIRD_AMBIENT.get() : null);
     }
 
     @Override

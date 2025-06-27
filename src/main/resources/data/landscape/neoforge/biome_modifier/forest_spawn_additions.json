@@ -2,7 +2,7 @@
   "type": "neoforge:add_spawns",
 
 
-  "biomes": "landscape:forest",
+  "biomes": "minecraft:forest",
 
   "spawners": [
     {
