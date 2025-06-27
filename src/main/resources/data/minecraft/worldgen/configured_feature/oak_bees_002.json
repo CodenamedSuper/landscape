@@ -15,7 +15,7 @@
     },
     "foliage_placer": {
       "type": "minecraft:blob_foliage_placer",
-      "height": 3,
+      "height": 4,
       "offset": 0,
       "radius": 2
     },

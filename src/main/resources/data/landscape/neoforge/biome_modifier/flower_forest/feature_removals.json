@@ -1,0 +1,9 @@
+{
+  "type": "neoforge:remove_features",
+
+  "biomes": "minecraft:flower_forest",
+
+  "features": "minecraft:patch_grass_badlands",
+
+  "steps": ["vegetal_decoration"]
+}

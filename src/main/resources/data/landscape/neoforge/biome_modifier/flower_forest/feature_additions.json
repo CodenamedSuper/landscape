@@ -1,0 +1,13 @@
+{
+  "type": "neoforge:add_features",
+
+  "biomes": "minecraft:flower_forest",
+
+  "features": [
+    "landscape:disk_coarse_dirt",
+    "landscape:patch_grass_flower_forest"
+
+  ],
+
+  "step": "vegetal_decoration"
+}
